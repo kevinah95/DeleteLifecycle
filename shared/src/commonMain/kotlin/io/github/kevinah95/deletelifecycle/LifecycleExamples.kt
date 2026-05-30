@@ -6,9 +6,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +40,8 @@ fun LifecycleDemoScreen() {
         "3. StartEffect",
         "4. ResumeEffect",
     )
-    var selectedIndex by remember { mutableStateOf(0) }
+    // rememberSaveable conserva el índice seleccionado al rotar la pantalla
+    var selectedIndex by rememberSaveable { mutableStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -144,7 +149,10 @@ fun Demo1_ObserveState() {
 
 @Composable
 fun Demo2_LifecycleEventEffect() {
-    val log: MutableList<String> = remember { mutableStateListOf() }
+    // listSaver serializa la lista como una List<String> para sobrevivir la rotación
+    val log: MutableList<String> = rememberSaveable(
+        saver = listSaver(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
+    ) { mutableStateListOf() }
 
     // Cada LifecycleEventEffect registra un callback puntual para ese evento.
     // Los effects se cancelan automáticamente cuando el composable sale
@@ -198,8 +206,10 @@ fun Demo2_LifecycleEventEffect() {
 
 @Composable
 fun Demo3_LifecycleStartEffect() {
-    val log: MutableList<String> = remember { mutableStateListOf() }
-    var isStarted by remember { mutableStateOf(false) }
+    val log: MutableList<String> = rememberSaveable(
+        saver = listSaver(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
+    ) { mutableStateListOf() }
+    var isStarted by rememberSaveable { mutableStateOf(false) }
 
     // LifecycleStartEffect recibe una key (igual que LaunchedEffect) y un bloque.
     // Dentro del bloque debes llamar onStopOrDispose { … } al final para
@@ -244,8 +254,10 @@ fun Demo3_LifecycleStartEffect() {
 
 @Composable
 fun Demo4_LifecycleResumeEffect() {
-    val log: MutableList<String> = remember { mutableStateListOf() }
-    var isResumed by remember { mutableStateOf(false) }
+    val log: MutableList<String> = rememberSaveable(
+        saver = listSaver(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
+    ) { mutableStateListOf() }
+    var isResumed by rememberSaveable { mutableStateOf(false) }
 
     // El bloque de setup corre en ON_RESUME.
     // El cleanup onPauseOrDispose corre en ON_PAUSE o al salir de la composición.
@@ -290,7 +302,8 @@ private fun DemoCard(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
         Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
