@@ -46,7 +46,7 @@ fun LifecycleDemoScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color.White)
             .safeContentPadding(),
     ) {
         Text(
@@ -151,7 +151,7 @@ fun Demo1_ObserveState() {
 fun Demo2_LifecycleEventEffect() {
     // listSaver serializa la lista como una List<String> para sobrevivir la rotación
     val log: MutableList<String> = rememberSaveable(
-        saver = listSaver(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
+        saver = listSaver<MutableList<String>, String>(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
     ) { mutableStateListOf() }
 
     // Cada LifecycleEventEffect registra un callback puntual para ese evento.
@@ -207,7 +207,7 @@ fun Demo2_LifecycleEventEffect() {
 @Composable
 fun Demo3_LifecycleStartEffect() {
     val log: MutableList<String> = rememberSaveable(
-        saver = listSaver(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
+        saver = listSaver<MutableList<String>, String>(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
     ) { mutableStateListOf() }
     var isStarted by rememberSaveable { mutableStateOf(false) }
 
@@ -255,7 +255,7 @@ fun Demo3_LifecycleStartEffect() {
 @Composable
 fun Demo4_LifecycleResumeEffect() {
     val log: MutableList<String> = rememberSaveable(
-        saver = listSaver(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
+        saver = listSaver<MutableList<String>, String>(save = { it.toList() }, restore = { mutableStateListOf(*it.toTypedArray()) })
     ) { mutableStateListOf() }
     var isResumed by rememberSaveable { mutableStateOf(false) }
 
