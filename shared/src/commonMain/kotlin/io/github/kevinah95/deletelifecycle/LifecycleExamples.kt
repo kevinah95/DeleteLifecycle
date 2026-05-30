@@ -25,7 +25,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.currentStateAsState
 
 // ---------------------------------------------------------------------------
-// Main screen – lets students navigate between the four lifecycle demos
+// Pantalla principal – permite a los estudiantes navegar entre los cuatro demos
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -45,13 +45,13 @@ fun LifecycleDemoScreen() {
             .safeContentPadding(),
     ) {
         Text(
-            text = "KMP Lifecycle Examples",
+            text = "Ejemplos del Lifecycle en KMP",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         )
 
-        // Tab row to pick a demo
+        // Fila de pestañas para seleccionar un demo
         PrimaryScrollableTabRow(selectedTabIndex = selectedIndex) {
             demos.forEachIndexed { index, title ->
                 Tab(
@@ -74,42 +74,42 @@ fun LifecycleDemoScreen() {
 }
 
 // ---------------------------------------------------------------------------
-// Demo 1 – Observing the current Lifecycle State
+// Demo 1 – Observar el Lifecycle State actual
 //
-// Concept: Every composable has access to the ambient LifecycleOwner via
-// LocalLifecycleOwner.  You can convert its state into Compose State<T> with
-// currentStateAsState() and react to it like any other state.
+// Concepto: Todo composable tiene acceso al LifecycleOwner del entorno a través
+// de LocalLifecycleOwner. Con currentStateAsState() conviertes su estado en un
+// Compose State<T> y puedes reaccionar a él como cualquier otro estado.
 //
-// States (in order): INITIALIZED → CREATED → STARTED → RESUMED
-//                                  ← STARTED ← PAUSED
-//                    DESTROYED ←  CREATED
+// Estados (en orden): INITIALIZED → CREATED → STARTED → RESUMED
+//                                   ← STARTED ← PAUSED
+//                     DESTROYED ←  CREATED
 // ---------------------------------------------------------------------------
 
 @Composable
 fun Demo1_ObserveState() {
-    // Obtain the nearest LifecycleOwner (provided by the Activity/Fragment)
+    // Obtenemos el LifecycleOwner más cercano (proporcionado por la Activity/Fragment)
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Convert the lifecycle state into Compose State so the UI recomposes
-    // automatically whenever the state changes
+    // Convertimos el lifecycle state en un Compose State para que la UI
+    // se recomponga automáticamente en cada transición
     val lifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
 
-    // Map each state to a descriptive colour for easy visual feedback
+    // Asignamos un color a cada estado para retroalimentación visual
     val stateColor = when (lifecycleState) {
-        Lifecycle.State.RESUMED   -> Color(0xFF4CAF50) // green
-        Lifecycle.State.STARTED   -> Color(0xFFFF9800) // orange
-        Lifecycle.State.CREATED   -> Color(0xFF2196F3) // blue
-        Lifecycle.State.DESTROYED -> Color(0xFFF44336) // red
-        else                      -> Color(0xFF9E9E9E) // grey
+        Lifecycle.State.RESUMED   -> Color(0xFF4CAF50) // verde
+        Lifecycle.State.STARTED   -> Color(0xFFFF9800) // naranja
+        Lifecycle.State.CREATED   -> Color(0xFF2196F3) // azul
+        Lifecycle.State.DESTROYED -> Color(0xFFF44336) // rojo
+        else                      -> Color(0xFF9E9E9E) // gris
     }
 
     DemoCard(
-        title = "1. Observing Lifecycle State",
-        description = "LocalLifecycleOwner gives you the ambient LifecycleOwner. " +
-                "currentStateAsState() turns its state into Compose State<T> so the " +
-                "UI recomposes on every transition.",
+        title = "1. Observando el Lifecycle State",
+        description = "LocalLifecycleOwner te da acceso al LifecycleOwner del entorno. " +
+                "currentStateAsState() convierte su estado en un Compose State<T> para que " +
+                "la UI se recomponga en cada transición.",
     ) {
-        Text("Hint: minimize / restore the app to see state changes.", fontSize = 12.sp, color = Color.Gray)
+        Text("Pista: minimiza y restaura la app para ver los cambios de estado.", fontSize = 12.sp, color = Color.Gray)
         Spacer(Modifier.height(12.dp))
 
         Box(
@@ -129,7 +129,7 @@ fun Demo1_ObserveState() {
 
         Spacer(Modifier.height(12.dp))
 
-        // Diagram showing all states
+        // Diagrama con todos los estados posibles
         LifecycleStateDiagram(current = lifecycleState)
     }
 }
@@ -137,90 +137,90 @@ fun Demo1_ObserveState() {
 // ---------------------------------------------------------------------------
 // Demo 2 – LifecycleEventEffect
 //
-// Concept: LifecycleEventEffect is a side-effect API that runs a lambda once
-// every time a specific Lifecycle.Event fires.  Unlike DisposableEffect you
-// choose which event triggers the lambda.
+// Concepto: LifecycleEventEffect es una API de side-effect que ejecuta un
+// lambda una vez cada vez que un Lifecycle.Event específico ocurre. A diferencia
+// de DisposableEffect, tú eliges qué evento dispara el lambda.
 // ---------------------------------------------------------------------------
 
 @Composable
 fun Demo2_LifecycleEventEffect() {
-    val log = remember { mutableStateListOf<String>() }
+    val log: MutableList<String> = remember { mutableStateListOf() }
 
-    // Each LifecycleEventEffect registers a one-shot callback for that event.
-    // The effects are automatically cancelled when the composable leaves
-    // the composition (no manual cleanup needed).
+    // Cada LifecycleEventEffect registra un callback puntual para ese evento.
+    // Los effects se cancelan automáticamente cuando el composable sale
+    // de la composición (no se necesita cleanup manual).
 
     LifecycleEventEffect(Lifecycle.Event.ON_CREATE) {
-        log.add("🟣 ON_CREATE  – composable entered composition")
+        log.add("🟣 ON_CREATE  – el composable entró en la composición")
     }
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
-        log.add("🔵 ON_START   – lifecycle moved to STARTED")
+        log.add("🔵 ON_START   – lifecycle pasó al estado STARTED")
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        log.add("🟢 ON_RESUME  – lifecycle moved to RESUMED (fully visible)")
+        log.add("🟢 ON_RESUME  – lifecycle pasó al estado RESUMED (visible e interactivo)")
     }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
-        log.add("🟡 ON_PAUSE   – lifecycle moved back to STARTED")
+        log.add("🟡 ON_PAUSE   – lifecycle regresó al estado STARTED")
     }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
-        log.add("🔴 ON_STOP    – lifecycle moved back to CREATED (hidden)")
+        log.add("🔴 ON_STOP    – lifecycle regresó al estado CREATED (oculto)")
     }
-    // ON_DESTROY is intentionally omitted: by the time the event fires, the
-    // composable is leaving composition and the effect would not run reliably.
+    // ON_DESTROY se omite intencionalmente: cuando el evento ocurre, el composable
+    // ya está saliendo de la composición y el effect no se ejecutaría de forma confiable.
 
     DemoCard(
         title = "2. LifecycleEventEffect",
-        description = "Registers a callback that fires once for the chosen event. " +
-                "Each event is independent – no cleanup lambda required.",
+        description = "Registra un callback que se dispara una vez por cada evento elegido. " +
+                "Cada evento es independiente – no se requiere lambda de cleanup.",
     ) {
-        Text("Hint: minimize / restore the app to trigger ON_STOP / ON_START.", fontSize = 12.sp, color = Color.Gray)
+        Text("Pista: minimiza y restaura la app para disparar ON_STOP / ON_START.", fontSize = 12.sp, color = Color.Gray)
         Spacer(Modifier.height(8.dp))
 
         if (log.isEmpty()) {
-            Text("No events yet…", color = Color.Gray, modifier = Modifier.padding(8.dp))
+            Text("Sin eventos todavía…", color = Color.Gray, modifier = Modifier.padding(8.dp))
         } else {
             EventLogView(log)
         }
 
         Spacer(Modifier.height(8.dp))
-        Button(onClick = { log.clear() }) { Text("Clear log") }
+        Button(onClick = { log.clear() }) { Text("Limpiar log") }
     }
 }
 
 // ---------------------------------------------------------------------------
 // Demo 3 – LifecycleStartEffect
 //
-// Concept: LifecycleStartEffect is like LaunchedEffect but tied to ON_START /
-// ON_STOP.  The setup block runs when the lifecycle reaches STARTED; the
-// onStopOrDispose cleanup block runs when it drops back to CREATED or the
-// composable leaves composition.
+// Concepto: LifecycleStartEffect es como LaunchedEffect pero vinculado a
+// ON_START / ON_STOP. El bloque de setup corre cuando el lifecycle llega a
+// STARTED; el bloque de cleanup onStopOrDispose corre cuando regresa a CREATED
+// o cuando el composable sale de la composición.
 // ---------------------------------------------------------------------------
 
 @Composable
 fun Demo3_LifecycleStartEffect() {
-    val log = remember { mutableStateListOf<String>() }
+    val log: MutableList<String> = remember { mutableStateListOf() }
     var isStarted by remember { mutableStateOf(false) }
 
-    // LifecycleStartEffect receives the key (like LaunchedEffect) and a block.
-    // Inside the block you call onStopOrDispose { … } at the end to provide
-    // the cleanup action.
+    // LifecycleStartEffect recibe una key (igual que LaunchedEffect) y un bloque.
+    // Dentro del bloque debes llamar onStopOrDispose { … } al final para
+    // definir la acción de cleanup.
     LifecycleStartEffect(Unit) {
         isStarted = true
-        log.add("▶ Started – setup block ran (ON_START)")
+        log.add("▶ Iniciado – bloque de setup ejecutado (ON_START)")
 
         onStopOrDispose {
             isStarted = false
-            log.add("⏹ Stopped – cleanup block ran (ON_STOP or dispose)")
+            log.add("⏹ Detenido – bloque de cleanup ejecutado (ON_STOP o dispose)")
         }
     }
 
     DemoCard(
         title = "3. LifecycleStartEffect",
-        description = "Setup runs on ON_START. The onStopOrDispose block runs on " +
-                "ON_STOP or when the composable leaves composition. " +
-                "Ideal for resources that should only be active while the screen is visible.",
+        description = "El setup corre en ON_START. El bloque onStopOrDispose corre en " +
+                "ON_STOP o cuando el composable sale de la composición. " +
+                "Ideal para recursos que solo deben estar activos mientras la pantalla es visible.",
     ) {
-        Text("Hint: minimize / restore the app.", fontSize = 12.sp, color = Color.Gray)
+        Text("Pista: minimiza y restaura la app.", fontSize = 12.sp, color = Color.Gray)
         Spacer(Modifier.height(8.dp))
 
         StatusBadge(active = isStarted, activeLabel = "STARTED", inactiveLabel = "STOPPED")
@@ -229,42 +229,43 @@ fun Demo3_LifecycleStartEffect() {
         EventLogView(log)
 
         Spacer(Modifier.height(8.dp))
-        Button(onClick = { log.clear() }) { Text("Clear log") }
+        Button(onClick = { log.clear() }) { Text("Limpiar log") }
     }
 }
 
 // ---------------------------------------------------------------------------
 // Demo 4 – LifecycleResumeEffect
 //
-// Concept: LifecycleResumeEffect is like LifecycleStartEffect but tied to
-// ON_RESUME / ON_PAUSE.  Use it for resources that must only run when the
-// screen is in the foreground and fully interactive (e.g. camera, sensors).
+// Concepto: LifecycleResumeEffect es como LifecycleStartEffect pero vinculado a
+// ON_RESUME / ON_PAUSE. Úsalo para recursos que solo deben estar activos cuando
+// la pantalla está en primer plano y es completamente interactiva (ej. cámara,
+// sensores).
 // ---------------------------------------------------------------------------
 
 @Composable
 fun Demo4_LifecycleResumeEffect() {
-    val log = remember { mutableStateListOf<String>() }
+    val log: MutableList<String> = remember { mutableStateListOf() }
     var isResumed by remember { mutableStateOf(false) }
 
-    // Setup block runs on ON_RESUME.
-    // onPauseOrDispose cleanup runs on ON_PAUSE or when leaving composition.
+    // El bloque de setup corre en ON_RESUME.
+    // El cleanup onPauseOrDispose corre en ON_PAUSE o al salir de la composición.
     LifecycleResumeEffect(Unit) {
         isResumed = true
-        log.add("▶ Resumed – setup block ran (ON_RESUME)")
+        log.add("▶ Reanudado – bloque de setup ejecutado (ON_RESUME)")
 
         onPauseOrDispose {
             isResumed = false
-            log.add("⏸ Paused – cleanup block ran (ON_PAUSE or dispose)")
+            log.add("⏸ Pausado – bloque de cleanup ejecutado (ON_PAUSE o dispose)")
         }
     }
 
     DemoCard(
         title = "4. LifecycleResumeEffect",
-        description = "Setup runs on ON_RESUME. The onPauseOrDispose block runs on " +
-                "ON_PAUSE or when the composable leaves composition. " +
-                "Use for interactive resources like camera or location.",
+        description = "El setup corre en ON_RESUME. El bloque onPauseOrDispose corre en " +
+                "ON_PAUSE o cuando el composable sale de la composición. " +
+                "Úsalo para recursos interactivos como la cámara o la ubicación.",
     ) {
-        Text("Hint: minimize / restore the app (ON_STOP also triggers ON_PAUSE first).", fontSize = 12.sp, color = Color.Gray)
+        Text("Pista: minimiza y restaura la app (ON_STOP también dispara ON_PAUSE primero).", fontSize = 12.sp, color = Color.Gray)
         Spacer(Modifier.height(8.dp))
 
         StatusBadge(active = isResumed, activeLabel = "RESUMED", inactiveLabel = "PAUSED")
@@ -273,12 +274,12 @@ fun Demo4_LifecycleResumeEffect() {
         EventLogView(log)
 
         Spacer(Modifier.height(8.dp))
-        Button(onClick = { log.clear() }) { Text("Clear log") }
+        Button(onClick = { log.clear() }) { Text("Limpiar log") }
     }
 }
 
 // ---------------------------------------------------------------------------
-// Shared UI helpers
+// Helpers de UI compartidos
 // ---------------------------------------------------------------------------
 
 @Composable
@@ -302,7 +303,7 @@ private fun DemoCard(
     }
 }
 
-/** Shows each Lifecycle.State as a coloured chip, highlighting the current one. */
+/** Muestra cada Lifecycle.State como un chip con color, resaltando el estado actual. */
 @Composable
 private fun LifecycleStateDiagram(current: Lifecycle.State) {
     val states = listOf(
@@ -313,7 +314,7 @@ private fun LifecycleStateDiagram(current: Lifecycle.State) {
         Lifecycle.State.DESTROYED,
     )
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        Text("All States", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+        Text("Todos los estados", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
         Spacer(Modifier.height(6.dp))
         states.forEachIndexed { index, state ->
             val isActive = state == current
@@ -365,7 +366,7 @@ private fun StatusBadge(active: Boolean, activeLabel: String, inactiveLabel: Str
 private fun EventLogView(log: List<String>) {
     val listState = rememberLazyListState()
 
-    // Auto-scroll to the latest entry
+    // Auto-scroll hacia la entrada más reciente
     LaunchedEffect(log.size) {
         if (log.isNotEmpty()) listState.animateScrollToItem(log.lastIndex)
     }
